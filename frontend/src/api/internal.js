@@ -134,12 +134,16 @@ api.interceptors.response.use(
   async (error) => {
     const originalReq = error.config;
 
+    // extract the value of message from json response if it exists
+    const errorMessage = error.response && error.response.data && error.response.data.message;
+
     if (
-      (error.response.status === 401 || error.response.status === 500) &&
-      originalReq &&
-      !originalReq._isRetry
+      errorMessage === 'Unauthorized' &&
+			(error.response.status === 401 || error.response.status === 500) &&
+			originalReq &&
+			!originalReq._isRetry
     ) {
-      originalReq.isRetry = true;
+      originalReq._isRetry = true;
 
       try {
         await axios.get(`${process.env.REACT_APP_INTERNAL_API_PATH}/refresh`, {
@@ -151,5 +155,6 @@ api.interceptors.response.use(
         return error;
       }
     }
+    throw error;
   }
 );
