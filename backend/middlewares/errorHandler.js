@@ -8,7 +8,7 @@ const errorHandler = (error, req, res, next) => {
     }
 
     if (error instanceof ValidationError){
-        status = 401;
+        status = 422;
         data.message = error.message;
 
         return res.status(status).json(data);
